@@ -87,5 +87,71 @@ FROM
 WHERE
 	SALARY NOT BETWEEN 5000 AND 12000;
 
+--2일차
 
+--LAST_NAME 에 u 가 포함되는 사원들의 사번, last_name 조회
+SELECT LAST_NAME, DEPARTMENT_ID
+FROM EMPLOYEES e 
+WHERE LAST_NAME LIKE '%u%';
+
+--LAST_NAME 의 4번째 문자가 a 인 사원들의 사번, last_name 조회
+SELECT last_name, DEPARTMENT_ID
+FROM EMPLOYEES e 
+WHERE LAST_NAME LIKE '___a%';
+
+--LAST_NAME 의 문자가 a 혹은 e 글자가 들어있는 사원들의 사번, last_name 조회 후 last_name 오름차순 조회
+SELECT last_name, DEPARTMENT_ID
+FROM EMPLOYEES e 
+WHERE LAST_NAME LIKE '%a%' OR LAST_NAME LIKE '%e%'
+ORDER BY LAST_NAME ASC;
+
+--LAST_NAME 의 문자가 a 와 e 글자가 들어있는 사원들의 사번, last_name 조회 후 last_name 오름차순 조회
+SELECT DEPARTMENT_ID, LAST_NAME
+FROM EMPLOYEES e 
+WHERE LAST_NAME LIKE '%a%e%' OR LAST_NAME LIKE '%e%a%'
+ORDER BY LAST_NAME ASC;
+
+-- 
+
+SELECT * FROM EMPLOYEES e;
+
+-- 매니저가 없는 사람들의 LAST_NAME, JOB_ID 조회
+SELECT LAST_NAME, JOB_ID 
+FROM EMPLOYEES e 
+WHERE MANAGER_ID IS NULL; 
+
+-- ST_CLERK 인 JOB_ID 를 가진 사원이 없는 부서 ID 조회 (단, 부서번호가 NULL 인 사원 제외)
+SELECT DISTINCT DEPARTMENT_ID
+FROM EMPLOYEES e WHERE JOB_ID NOT IN ('ST_CLERK') AND DEPARTMENT_ID IS NOT NULL;
+
+-- COMMISSION_PCT 가 NULL 이 아닌 사원들 중에서 COMMISSION = SALARY * COMMISSION_PCT
+-- 를 구하여 EMPLOYEE_ID, FIRST_NAME, JOB_ID, COMMISSION 를 조회
+SELECT EMPLOYEE_ID, FIRST_NAME, JOB_ID, SALARY *COMMISSION_PCT AS COMMISSION
+FROM EMPLOYEES e 
+WHERE COMMISSION_PCT IS NOT NULL; 
+
+
+-- NULL * 숫자 = NULL
+SELECT EMPLOYEE_ID, FIRST_NAME, JOB_ID, SALARY,COMMISSION_PCT, SALARY *COMMISSION_PCT AS COMMISSION
+FROM EMPLOYEES e;
+
+-- FIRST_NAME 이 'Curtis' 인 사원의 first_name, last_name, email, phone_number, job_id 를 
+-- 조회한다. 단 job_id 결과는 소문자로 출력한다
+SELECT FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, LOWER(JOB_ID)
+FROM EMPLOYEES e 
+WHERE FIRST_NAME = 'Curtis';
+
+-- 부서번호가 60,70,80,90 인 사원들의 employee_id, first_name, hire_date, job_id 조회
+-- 단, job_id가 IT_PROG인 사원의 경우 프로그래머로 변경하여 출력한다.
+SELECT employee_id, first_name, hire_date, REPLACE(job_id, 'IT_PROG', '프로그래머')
+FROM EMPLOYEES e 
+WHERE DEPARTMENT_ID IN(60,70,80,90);
+
+-- JOB_ID 가 AD_PRES, PUCLERK 인 사원들의 employee_id, first_name, job_id 조회
+-- 단, 사원명은 FIRST_NAME 과 LAST_NAME 의 공백을 포함하여 연결
+-- 'ABC' 'DEF' => 'ABC DEF'
+
+SELECT EMPLOYEE_ID, FIRST_NAME || ' ' || LAST_NAME AS NAME, JOB_ID
+FROM EMPLOYEES e 
+WHERE JOB_ID IN ('AD_PRES', 'PU_CLERK');
 
