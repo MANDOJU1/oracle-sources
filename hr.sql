@@ -155,3 +155,183 @@ SELECT EMPLOYEE_ID, FIRST_NAME || ' ' || LAST_NAME AS NAME, JOB_ID
 FROM EMPLOYEES e 
 WHERE JOB_ID IN ('AD_PRES', 'PU_CLERK');
 
+
+-- 부서 80의 각 사원에 대해 적용가능한 세율을 표시
+-- 월 급여 0~ 1,999 / 세율 0%
+-- 월 급여 2,000~ 3,999 / 세율 9%
+-- 월 급여 4,000~ 5,999 / 세율 20%
+-- 월 급여 6,000 ~7,999 / 세율 30%
+-- 월 급여 8,000 ~ 9,999 / 세율 40%
+-- 월 급여 10,000 ~ 11,999 / 세율 42%
+-- 월 급여 12,000 ~ 13,999 / 세율 44%
+-- 월 급여 14,000~ / 세율 45%
+
+SELECT LAST_NAME, SALARY,
+CASE trunc(salary / 2000,0)
+	WHEN 0 THEN '0%'
+	WHEN 1 THEN '1%'
+	WHEN 2 THEN '2%'
+	WHEN 3 THEN '3%'
+	WHEN 4 THEN '40%'
+	WHEN 5 THEN '42%'
+	WHEN 6 THEN '44%'
+	ELSE '45%'
+END AS TAX_RATE
+FROM EMPLOYEES e 
+WHERE DEPARTMENT_ID = 80;
+
+
+
+SELECT LAST_NAME, SALARY,
+	CASE
+	WHEN TRUNC(SALARY/2000,0) < 0 THEN '0%'
+	WHEN TRUNC(SALARY/2000,0) < 1 THEN '1%'
+	WHEN TRUNC(SALARY/2000,0) < 2 THEN '2%'
+	WHEN TRUNC(SALARY/2000,0) < 3 THEN '3%'
+	WHEN TRUNC(SALARY/2000,0) < 4 THEN '40%'
+	WHEN TRUNC(SALARY/2000,0) < 5 THEN '42%'
+	WHEN TRUNC(SALARY/2000,0) < 6 THEN '44%'
+	ELSE '45%'
+END AS TAX_RATE
+FROM EMPLOYEES e
+WHERE DEPARTMENT_ID = 80;
+
+
+-- 최대 연봉- 최소연봉 차이 조회
+SELECT max(SALARY) - min(SALARY)
+FROM EMPLOYEES e;
+
+-- 매니저로 근무하는 사원들의 총 수 조회(매니저번호 중복 제거)
+SELECT count(DISTINCT MANAGER_ID)
+FROM EMPLOYEES e ;
+
+
+-- 부서별 직원 수 구하기(부서번호의 오름차순 출력)
+SELECT count(EMPLOYEE_ID),DEPARTMENT_ID 
+FROM EMPLOYEES e 
+GROUP BY DEPARTMENT_ID
+ORDER BY DEPARTMENT_ID;
+
+--부서별 평균 급여 (부서번호의 오름차순 출력)
+SELECT round(AVG(salary)), DEPARTMENT_ID 
+FROM EMPLOYEES e 
+GROUP BY DEPARTMENT_ID
+ORDER BY DEPARTMENT_ID;
+
+-- 동일한 직무(JOB_ID)를 가진 사원들의 총 수 조회
+SELECT COUNT(EMPLOYEE_ID), JOB_ID
+FROM EMPLOYEES e 
+GROUP BY JOB_ID
+ORDER BY JOB_ID;
+
+-- 매니저가 관리하는 사원들 중에서 최소급여 조회
+-- 매니저가 관리하는 사원들 중에서 최소급여가 6000미만인 최소급여는 제외
+-- 매니저가 없는 사원 제외 !! 
+
+SELECT MANAGER_ID, min(SALARY)
+FROM EMPLOYEES e 
+WHERE MANAGER_ID IS NOT NULL 
+GROUP BY MANAGER_ID HAVING min(SALARY) > 6000
+ORDER BY MANAGER_ID;
+
+
+-- 자신의 담당 매니저의 고용일보다 빠른 입사자 찾기 (HIRE_DATE, LAST_NAME, MANAGER_ID)
+
+SELECT
+	e.employee_id AS 내사원번호,
+	e.hire_date AS 내입사일,
+	e.last_name AS 내이름,
+	e.manager_id AS 매니저번호,
+	e2.HIRE_DATE AS 매니저입사일
+FROM
+	EMPLOYEES e 
+JOIN EMPLOYEES e2 ON
+	e.manager_id = E2.MANAGER_ID AND e.hire_date < e2. HIRE_DATE;
+
+
+-- 도시 이름 T로 시작하는 지역에 사는 사원들의 사번, LAST_NAME, 부서번호 조회
+-- (도시명은 Location 테이블에)
+
+SELECT
+	e.EMPLOYEE_ID, e.LAST_NAME, d.DEPARTMENT_ID, L.CITY  
+FROM
+	EMPLOYEES e
+JOIN DEPARTMENTS d ON
+	e.DEPARTMENT_ID = d.DEPARTMENT_ID
+JOIN LOCATIONS l ON
+	d.LOCATION_ID = l.LOCATION_ID 
+WHERE l.CITY LIKE 'T%';
+
+
+-- 위치 아이디가 1700인 사원들의 LAST_NAME, 부서번호, 연봉 조회
+SELECT
+	last_name,
+	d.DEPARTMENT_ID,
+	E.SALARY
+FROM
+	DEPARTMENTS d
+JOIN EMPLOYEES e ON
+	d.DEPARTMENT_ID = e.DEPARTMENT_ID
+WHERE
+	d.LOCATION_ID = 1700;
+
+
+
+-- 부서명, 위치ID, 각부서별 사원 수, 각 부서별 평균 연봉 조회
+-- 평균 연봉은 소수점 2자리까지만 표현
+SELECT
+	d.DEPARTMENT_NAME,
+	d.LOCATION_ID,
+	COUNT(E.EMPLOYEE_ID), 
+	ROUND(AVG(E.SALARY),2)
+FROM
+	DEPARTMENTS d
+JOIN EMPLOYEES e ON
+	d.DEPARTMENT_ID = e.DEPARTMENT_ID
+GROUP BY D.DEPARTMENT_NAME, D.LOCATION_ID, E.EMPLOYEE_ID
+ORDER BY D.LOCATION_ID 
+
+
+
+--Executive 부서에 근무하는 사원들의 부서번호, LAST_NAME, JOB_ID 조회
+SELECT
+	d.DEPARTMENT_ID, e.LAST_NAME, e.JOB_ID 
+FROM
+	EMPLOYEES e 
+JOIN DEPARTMENTS d  ON
+	E.DEPARTMENT_ID = D.DEPARTMENT_ID AND D.DEPARTMENT_ID ='Executive';
+
+
+
+-- 각 사원별 소속 부서에서 자신보다 늦게 고용되었으나 많은 연봉을 받는 사원이 존재하는
+-- 사원들의 이름 조회(이름은 FIRST_NAME과 LAST_NAME을 결합하여 하나로 나오게하기)
+-- 부서번호, 결합된 이름, SALARY< HIRE_DATE 출력
+
+SELECT
+	DISTINCT e.department_id AS 부서번호,
+	e.first_name || ' ' || e.last_name AS "내이름",
+	e.salary AS 내급여,
+	e.hire_date AS 내입사일
+FROM
+	EMPLOYEES e
+JOIN EMPLOYEES e2 ON
+	e.department_id = e2.DEPARTMENT_ID
+	AND e.salary < e2.SALARY AND e.hire_date < e2.HIRE_DATE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
