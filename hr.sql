@@ -246,7 +246,7 @@ SELECT
 FROM
 	EMPLOYEES e 
 JOIN EMPLOYEES e2 ON
-	e.manager_id = E2.MANAGER_ID AND e.hire_date < e2. HIRE_DATE;
+	e.manager_id = E2.EMPLOYEE_ID AND e.hire_date < e2. HIRE_DATE;
 
 
 -- 도시 이름 T로 시작하는 지역에 사는 사원들의 사번, LAST_NAME, 부서번호 조회
