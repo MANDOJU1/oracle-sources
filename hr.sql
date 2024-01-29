@@ -519,3 +519,50 @@ WHERE
 			DEPARTMENTS d
 		WHERE
 			D.LOCATION_ID = 1700));
+		
+		
+		
+		
+SELECT * FROM EMPLOYEES e WHERE FIRST_NAME = 'Jack';
+		
+
+-- 테이블 생성 : 구조, 데이터복사
+CREATE TABLE idx_employees AS SELECT DISTINCT first_name, last_name, hire_date FROM EMPLOYEES e;	
+		
+		
+-- index 생성
+CREATE INDEX idx_name ON idx_employees(first_name);		
+
+-- INDEX 사용해서 조회 => range scan
+SELECT * FROM idx_employees  WHERE FIRST_NAME = 'Jack'
+		
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
