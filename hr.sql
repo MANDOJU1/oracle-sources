@@ -531,38 +531,12 @@ CREATE TABLE idx_employees AS SELECT DISTINCT first_name, last_name, hire_date F
 		
 		
 -- index 생성
-CREATE INDEX idx_name ON idx_employees(first_name);		
+CREATE INDEX idx_name ON idx_employees(first_name);
 
 -- INDEX 사용해서 조회 => range scan
 SELECT * FROM idx_employees  WHERE FIRST_NAME = 'Jack'
 		
 		
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		
